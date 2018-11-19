@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="zh" ng-app="xiaoyueApp">
+<head>
+  <meta charset="utf-8">
+  <meta name="description" content="AmbEr's World, 晓乐的世界，一个可以在电脑，手机和平板电脑上玩的中文学习游戏。海外儿童学中文不再烦恼。" />
+  <meta name="keywords" content="AmbEr's World, 晓乐的世界，晓乐，学中文，海外儿童学中文，中文，写字板，玩游戏，Amber, Chinese learning, Writing board, Chinese learning Games, Chinese learning Audio books, Chinese as Second language, Chinese Character" />
+  <meta name="author" content="晓乐的世界" />
+  <meta name="fragment" content="!">
+  <meta name="msvalidate.01" content="1D9522EE9DAA5EEA4AAF93A8F5355D5E" />
+  <meta name="viewport" content="initial-scale=1.0,  maximum-scale=1.0, user-scalable=no">
+  <link rel="apple-touch-icon" href="/static/img/ios_startup.png"> 
+  <title>晓乐的世界 : {{title||"Home"}}</title>
+  <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+  <!--[if lt IE 9]>
+    <script src="vendor/ie/html5shiv.min.js"></script>
+    <script src="vendor/ie/respond.min.js"></script>
+  <![endif]-->
+  <!--link href='http://www.youziku.com/webfont/CSS/cc6cec6c4d41d7dda1f02f271f0be39d' rel='stylesheet' type='text/css'/-->
+  <style>
+    body{background: url(/static/img/home-bg.jpg) repeat #8c3f02;}
+  </style>
+  <link rel="stylesheet" type="text/css" href="/static/app.css">
+  <script type="text/javascript">
+     //for mobile phone
+     window.addEventListener('orientationchange', function(){
+        location.reload();
+        setTimeout(function() {
+          window.scrollTo(0, 1);
+        }, 1000);
+      });
+     if (window.location.protocol != "https:" && window.location.hostname.indexOf('localhost') == -1){
+        window.location.href = "https:" + window.location.href.substring(window.location.protocol.length);
+      }
+  </script>
+  <script async type="text/javascript" src="/static/xiaoyues-world-zh-cn.js"></script>
+
+  <script type="text/javascript">
+  //google analytics
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-60803580-1']);
+  _gaq.push(['_setDomainName', 'amberwd.com']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+</head>
+<body ng-class="{'pageLoaded': isViewLoaded, 'portrait': isPortrait, 'smallSize': isSmallSize}">
+  <iframe frameborder="0" allowtrasparency="true" src="/payment-zh.html?type=" id="ifmPayment" name="ifmPayment"></iframe>
+  <div class="siteMessage">
+    <div class="msg-wrapper">
+      <span class="isPortrait">请旋转90度使用Landscape模式来看网站。</span>
+      <span class="isSmall">请使用宽度大于960像素的装置。</span>
+    </div>
+  </div>
+  <div class="container-liquid">
+    <header ng-controller="mainCtrl" id="header" ng-hide="maxScreen">
+      <a href="../" class="logo"><img ng-src="{{CONFIG.imgBase}}/logoch.png"></a>
+    </header>
+    <div class="main">
+      <div ng-view class="view-frame"></div>
+    </div>  
+    <footer ng-controller="mainCtrl" ng-hide="maxScreen">
+      <div class="copyright">
+            晓乐的世界 &copy; 2013-2016 <a href="http://www.bcstudioinc.net" target="_blank;">毕盛工作室.</a> - 产权保护. | <a href="http://bit.ly/amberwd" target="_blank;">Download iPad App</a>
+       </div>
+    </footer>
+    <div class="loader">
+      <img src="/static/img/common/loading.gif">
+    </div>
+    <!--script type="text/javascript" src="http://www.youziku.com/UserDownFile/jquery.md5.js"></script-->
+      <script type="application/ld+json">
+    {
+      "@context": "http://amberwd.com",
+      "@type": "Website",
+      "url": "http://www.amberwd.com",
+      "logo": "http://www.amberwd.com/static/img/logoch.png"
+    }
+    </script>
+    <!--script>
+    //Optimize CSS Delivery, from https://developers.google.com/speed/docs/insights/OptimizeCSSDelivery
+    var cb = function(){
+      var l = document.createElement('link'); l.rel = 'stylesheet';
+      l.href = '/static/app.css';
+      var h = document.getElementsByTagName('head')[0]; h.parentNode.insertBefore(l, h);
+    };
+    var raf = requestAnimationFrame || mozRequestAnimationFrame ||
+          webkitRequestAnimationFrame || msRequestAnimationFrame;
+    if (raf) raf(cb);
+      else window.addEventListener('load', cb);
+    </script-->
+  </div>
+</body>
+</html>

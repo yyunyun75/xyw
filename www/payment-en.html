@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html ng-app="myPayment">
+<head>
+	<meta charset="utf-8">
+	<title>Payment</title>
+	<link rel="stylesheet" type="text/css" href="/static/app.css"/>
+  <link rel="stylesheet" type="text/css" href="/static/payment.css"/>
+  <script type="text/javascript" src="https://js.stripe.com/v2/"></script>
+  <script type="text/javascript" src="/static/jquery.js"></script>
+	<script type="text/javascript" src="/static/angular.js"></script>
+  <script type="text/javascript" src="/static/angular-local-storage.js"></script>
+	<script type="text/javascript">
+  if(window.location.hostname.indexOf('localhost') > -1){
+    Stripe.setPublishableKey('pk_test_RYhv1vMvgcSf9mVv0vKdy4rC'); 
+  }else{
+    Stripe.setPublishableKey('pk_live_ws66Y2fG1NPebg4keMmnDag9');
+  }
+	
+  angular.module('myPayment', ['ui.bootstrap', 'LocalStorageModule', 'ngCookies', 'ngRoute'])
+    .config(['localStorageServiceProvider', function(localStorageServiceProvider){
+      localStorageServiceProvider.setPrefix('xyw');
+    }])
+		.controller('paymentCtrl', ['$scope', '$window', 'localStorageService', '$cookieStore', '$http', function($scope, $window, localStorageService, $cookieStore, $http){
+
+      var parentScope;
+
+      setTimeout(function(){
+        parentScope = parent.angular.element('header').scope();
+      }, 1000);
+
+      $scope.curUser = {};
+
+      $scope.charge = function(){
+        $scope.disabled = true;
+        // console.log($('.card-number').val(), $('.card-cvc').val(), $scope.expM, $scope.expY);
+        Stripe.card.createToken({
+          number: $('.card-number').val(),
+          cvc: $('.card-cvc').val(),
+          exp_month: $scope.expM,
+          exp_year: $scope.expY
+        }, stripeResponseHandler);
+
+      };
+
+      $scope.close = function(){       
+        parent.closeIframe('ifmPayment', false);
+      }
+
+      $scope.$watch('exp', function(newValue){
+        if(newValue && newValue.indexOf('/')>0){
+          $scope.expM = $scope.exp.split('/')[0];
+          $scope.expY = $scope.exp.split('/')[1];
+        }
+      })
+
+      var stripeResponseHandler = function(status, response){
+        // console.log(status, response);
+        if(typeof response.id == 'undefined'){
+          alert('your card is not valid, try it again!');
+          return false;
+        }
+        $('#paymentForm').append($('<input type="hidden" name="stripeToken" />').val(response.id));
+        // console.log($('#paymentForm').serialize());        
+        $.post(
+          '/charge',
+          $('#paymentForm').serialize(),
+          function(msg){
+              if(msg&&!!msg.created){
+                // var curDate = new Date();
+                var payment = {};
+                payment.id = msg.id;
+                payment.date = msg.created;
+                payment.amount = msg.amount * 0.01;
+                payment.product = $scope.product;
+
+                parentScope.savePay(payment);
+
+              }else{
+                alert(msg.message);
+              }
+          }
+        );
+      };
+
+		}]);
+	</script>
+</head>
+<body>
+<div class="paymentPage" ng-controller="paymentCtrl">
+  <div class="inner">
+    <div class="header">
+      <a class="close" style="opacity: 1; transition: none; -webkit-transition: none;" ng-click="close()"></a>
+      <div class="image">
+        <img src="/static/img/logoch.png">
+      </div>
+      <div class="title">
+        <h1>AmbEr's World</h1>
+        <h2>{{membership}} (${{amount}})</h2>
+      </div>
+    </div>
+    <form ng-submit="charge()" method="POST" id="paymentForm" name="paymentForm" class="form-horizontal">
+      {{paymentForm.cardNumber.$error.required}}
+      <span class="error" ng-show="paymentForm.cardNumber.$error.required">Required!</span>
+      <div class="form-group">
+        <div class="input">
+          <input type="text" size="20" placeholder="Full Name" class="control" ng-model="curUser.username">
+          <div class="svg icon" style="width: 30px; height: 30px;"><svg version="1.1" viewBox="0 0 30 30" width="30" height="30" focusable="false"><g fill-rule="evenodd"><path d="M22.257,19.678c-1.112-0.533-5.096-2.467-5.417-2.99
+          v-0.811h-0.163c0.49-0.528,0.874-1.281,1.089-2.162c0.074,0.082,0.163,0.13,0.258,0.13c0.27,0,0.487-0.382,0.487-0.853
+          c0-0.471-0.218-0.853-0.487-0.853c-0.023,0-0.048,0.004-0.069,0.01c0-0.015,0-0.03,0-0.045c0-1.189,0.242-2.818-0.237-3.633
+          c-0.54-0.919-1.852-0.951-2.718-0.951c-0.816,0-2.223,0.24-2.758,1.07c-0.535,0.829-0.198,2.248-0.198,3.514
+          c0,0.022,0,0.043,0,0.066c-0.281,0.098-0.488,0.428-0.488,0.822c0,0.471,0.295,0.853,0.66,0.853c0.016,0,0.032-0.002,0.048-0.003
+          c0.219,0.826,0.588,1.533,1.057,2.035v0.811c0,0-3.503,2.389-5.125,2.99H7.591v0.126c-0.062,0.002-0.066,0.006,0,0.011v2.706h14.952
+          v-2.843H22.257z" fill="none" stroke="#559A28" transform="translate(0,2)"></path></g></svg></div>
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="input">
+          <input type="text" size="20" placeholder="Email" class="control" data-ng-model="curUser.email" name="userEmail">
+          <div class="svg icon" style="width: 30px; height: 30px;"><svg version="1.1" viewBox="0 0 30 30" width="30" height="30" focusable="false"><g fill-rule="evenodd"><path d="M1.86849119,1.00882648 C1.91231938,1.00300503 1.95704343,1 2.00247329,1 L11.9975267,1 C12.0428075,1 12.0874644,1.00306369 12.1312901,1.00899658 L7,5 L1.86849119,1.00882648 Z M1.05353134,1.67496881 C1.01882906,1.77613675 1,1.88463985 1,1.99754465 L1,9.00245535 C1,9.55338405 1.45576096,10 2.00247329,10 L11.9975267,10 C12.5511774,10 13,9.5536886 13,9.00245535 L13,1.99754465 C13,1.88482573 12.9809217,1.77647338 12.9458895,1.67541927 L7,6.29999999 L1.05353134,1.67496881 Z M2.00585866,0 C0.898053512,0 0,0.900176167 0,1.99201702 L0,9.00798298 C0,10.1081436 0.897060126,11 2.00585866,11 L11.9941413,11 C13.1019465,11 14,10.0998238 14,9.00798298 L14,1.99201702 C14,0.891856397 13.1029399,0 11.9941413,0 L2.00585866,0 Z M2.00585866,0" style="fill:#559a28" transform="translate(8,10)"></path></g></svg></div>
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="input top">
+          <input type="text" size="20" placeholder="Card number" name="cardNumber" class="control card-number" required/>
+          <div class="svg icon" style="width: 30px; height: 30px;"><svg version="1.1" viewBox="0 0 30 30" width="30" height="30" focusable="false"><g fill-rule="evenodd"><path d="M2.00585866,0 C0.898053512,0 0,0.900176167 0,1.99201702 L0,9.00798298 C0,10.1081436 0.897060126,11 2.00585866,11 L11.9941413,11 C13.1019465,11 14,10.0998238 14,9.00798298 L14,1.99201702 C14,0.891856397 13.1029399,0 11.9941413,0 L2.00585866,0 Z M2.00247329,1 C1.44882258,1 1,1.4463114 1,1.99754465 L1,9.00245535 C1,9.55338405 1.45576096,10 2.00247329,10 L11.9975267,10 C12.5511774,10 13,9.5536886 13,9.00245535 L13,1.99754465 C13,1.44661595 12.544239,1 11.9975267,1 L2.00247329,1 Z M1,3 L1,5 L13,5 L13,3 L1,3 Z M11,8 L11,9 L12,9 L12,8 L11,8 Z M9,8 L9,9 L10,9 L10,8 L9,8 Z M9,8" style="fill:#559a28" transform="translate(8,10)"></path></g></svg></div>
+        </div>
+        <div class="subInput left">
+           <input type="text" size="2" placeholder="MM / YY" class="control" data-ng-model="exp" required/>
+           <input type="hidden" data-stripe="exp-month" data-ng-model="expM" class="card-expiry-month"/>
+           <input type="hidden" data-strip="exp-year" data-ng-model="expY" class="card-expiry-year"/>
+           <div class="svg icon" style="width: 30px; height: 30px;"><svg version="1.1" viewBox="0 0 30 30" width="30" height="30" focusable="false"><g fill-rule="evenodd"><path d="M2.0085302,1 C0.899249601,1 0,1.90017617 0,2.99201702 L0,10.007983 C0,11.1081436 0.901950359,12 2.0085302,12 L9.9914698,12 C11.1007504,12 12,11.0998238 12,10.007983 L12,2.99201702 C12,1.8918564 11.0980496,1 9.9914698,1 L2.0085302,1 Z M1.99539757,4 C1.44565467,4 1,4.43788135 1,5.00292933 L1,9.99707067 C1,10.5509732 1.4556644,11 1.99539757,11 L10.0046024,11 C10.5543453,11 11,10.5621186 11,9.99707067 L11,5.00292933 C11,4.44902676 10.5443356,4 10.0046024,4 L1.99539757,4 Z M3,1 L3,2 L4,2 L4,1 L3,1 Z M8,1 L8,2 L9,2 L9,1 L8,1 Z M3,0 L3,1 L4,1 L4,0 L3,0 Z M8,0 L8,1 L9,1 L9,0 L8,0 Z M8,0" style="fill:#559a28" transform="translate(8,9)"></path></g></svg></div>
+        </div>
+        <div class="subInput right">
+          <input type="text" size="4" data-stripe="cvc" class="control card-cvc" placeholder="CVC" required/>
+          <div class="svg icon" style="width: 30px; height: 30px;"><svg version="1.1" viewBox="0 0 30 30" width="30" height="30" focusable="false"><g fill-rule="evenodd"><path d="M8.8,4 C8.8,1.79086089 7.76640339,4.18628304e-07 5.5,0 C3.23359661,-4.1480896e-07 2.2,1.79086089 2.2,4 L3.2,4 C3.2,2.34314567 3.81102123,0.999999681 5.5,1 C7.18897877,1.00000032 7.80000001,2.34314567 7.80000001,4 L8.8,4 Z M1.99201702,4 C0.891856397,4 0,4.88670635 0,5.99810135 L0,10.0018986 C0,11.1054196 0.900176167,12 1.99201702,12 L9.00798298,12 C10.1081436,12 11,11.1132936 11,10.0018986 L11,5.99810135 C11,4.89458045 10.0998238,4 9.00798298,4 L1.99201702,4 Z M1.99754465,5 C1.44661595,5 1,5.45097518 1,5.99077797 L1,10.009222 C1,10.5564136 1.4463114,11 1.99754465,11 L9.00245535,11 C9.55338405,11 10,10.5490248 10,10.009222 L10,5.99077797 C10,5.44358641 9.5536886,5 9.00245535,5 L1.99754465,5 Z M1.99754465,5" style="fill:#559a28" transform="translate(9,9)"></path></g></svg></div>
+        </div>
+      </div>
+      <div class="form-group">
+        <input type="hidden" name="description" ng-value="product"/>
+        <input type="hidden" name="amount" ng-value="amount"/>
+        <button type="submit" class="btn btn-danger btn-lg">Pay ${{amount}}</button>
+      </div>
+    </form>
+  </div>
+</div>
+</body>
+</html>

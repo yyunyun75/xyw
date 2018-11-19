@@ -1,0 +1,139 @@
+/* line 1, ../src/sass/splash.scss */
+html, body {
+  height: 100%;
+  width: 100%;
+  font-family: "Trebuchet MS", Helvetica, sans-serif;
+}
+
+/* line 6, ../src/sass/splash.scss */
+body {
+  background: url(../img/splash/bg.jpg) no-repeat #454241;
+  background-size: 100% auto;
+  padding: 0px;
+  margin: 0px;
+}
+
+/* line 12, ../src/sass/splash.scss */
+div, a {
+  box-sizing: border-box;
+}
+
+/* line 15, ../src/sass/splash.scss */
+.container {
+  width: 80%;
+  height: 90%;
+  margin: 5% auto;
+  overflow: hidden;
+}
+/* line 20, ../src/sass/splash.scss */
+.container > div {
+  display: inline-block;
+  vertical-align: middle;
+  height: 100%;
+}
+
+/* line 26, ../src/sass/splash.scss */
+.col-left {
+  width: 30%;
+}
+/* line 28, ../src/sass/splash.scss */
+.col-left > img {
+  width: 100%;
+  display: block;
+  float: left;
+}
+
+/* line 34, ../src/sass/splash.scss */
+.col-right {
+  width: 65%;
+}
+
+/* line 37, ../src/sass/splash.scss */
+.footer {
+  width: 100%;
+  text-align: right;
+  color: white;
+}
+/* line 41, ../src/sass/splash.scss */
+.footer a {
+  color: white;
+}
+
+/* line 45, ../src/sass/splash.scss */
+h1, h2, h3 {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+}
+/* line 51, ../src/sass/splash.scss */
+h1 span, h2 span, h3 span {
+  position: absolute;
+  left: -2000px;
+}
+
+/* line 57, ../src/sass/splash.scss */
+h1.title-cn {
+  background-image: url(../img/splash/title-cn.png);
+  height: 22%;
+}
+
+/* line 63, ../src/sass/splash.scss */
+h2.title-en {
+  height: 6%;
+  background-image: url(../img/splash/title-en.png);
+}
+
+/* line 69, ../src/sass/splash.scss */
+h3.title-cn {
+  background-image: url(../img/splash/txt-cn.png);
+  height: 10%;
+}
+/* line 73, ../src/sass/splash.scss */
+h3.title-en {
+  height: 6%;
+  background-image: url(../img/splash/txt-en.png);
+}
+
+/* line 78, ../src/sass/splash.scss */
+.btn {
+  border: 5px solid black;
+  display: inline-block;
+  margin: 1% 2%;
+  width: 44%;
+  background: url(../img/splash/btn-bg.jpg) repeat;
+  height: 13%;
+  padding: 1%;
+  position: relative;
+}
+/* line 79, ../src/sass/splash.scss */
+.btn:hover {
+  -webkit-transform: scale(1.05);
+  -moz-transform: scale(1.05);
+  -o-transform: scale(1.05);
+  transform: scale(1.05);
+}
+/* line 93, ../src/sass/splash.scss */
+.btn span {
+  display: block;
+  background-color: #56292e;
+  width: 100%;
+  height: 100%;
+  background-repeat: no-repeat;
+  background-size: 90% 90%;
+  background-position: center;
+}
+/* line 101, ../src/sass/splash.scss */
+.btn span i {
+  position: absolute;
+  left: -2000px;
+}
+/* line 106, ../src/sass/splash.scss */
+.btn.btn-en span {
+  background-image: url(../img/splash/btn-en.png);
+}
+/* line 109, ../src/sass/splash.scss */
+.btn.btn-cn span {
+  background-image: url(../img/splash/btn-cn.png);
+}
